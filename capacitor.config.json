@@ -1,0 +1,9 @@
+{
+  "appId": "com.spendtrack.pro",
+  "appName": "SpendTrack Pro",
+  "webDir": "build",
+  "bundledWebRuntime": false,
+  "android": {
+    "backgroundColor": "#0f0f1a"
+  }
+}
