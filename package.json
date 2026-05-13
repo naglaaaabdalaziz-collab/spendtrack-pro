@@ -1,0 +1,8 @@
+spendtrack-pro/
+├── .github/
+│   └── workflows/
+│       └── build.yml ✅
+├── package.json      ← هنا في الجذر
+├── capacitor.config.json
+├── public/
+└── src/
