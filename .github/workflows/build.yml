@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -13,17 +13,29 @@ jobs:
           node-version: '18'
       - uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'temurin'
-      - uses: android-actions/setup-android@v3
-      - run: npm install
-      - run: npm run build
-      - run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install dependencies
+        run: npm install
+      - name: Build React app
+        run: npm run build
+      - name: Setup Capacitor
+        run: |
+          npm install @capacitor/core@5.7.0 @capacitor/cli@5.7.0 @capacitor/android@5.7.0
           npx cap add android || true
           npx cap copy android
           npx cap sync android
-      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - name: Fix Gradle permissions
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew wrapper --gradle-version=8.0.2
+      - name: Build APK
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon -Dorg.gradle.jvmargs="-Xmx2g"
       - uses: actions/upload-artifact@v4
         with:
           name: SpendTrack-Pro-APK
