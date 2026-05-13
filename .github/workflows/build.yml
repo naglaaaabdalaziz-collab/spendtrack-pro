@@ -15,27 +15,20 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-      - name: Install dependencies
-        run: npm install
-      - name: Build React app
-        run: npm run build
-      - name: Setup Capacitor
-        run: |
+      - uses: android-actions/setup-android@v3
+      - run: npm install
+      - run: npm run build
+      - run: |
           npm install @capacitor/core@5.7.0 @capacitor/cli@5.7.0 @capacitor/android@5.7.0
           npx cap add android || true
           npx cap copy android
           npx cap sync android
-      - name: Fix Gradle permissions
+      - name: Fix minSdk
         run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew wrapper --gradle-version=8.0.2
-      - name: Build APK
-        run: |
-          cd android
-          ./gradlew assembleDebug --no-daemon -Dorg.gradle.jvmargs="-Xmx2g"
+          sed -i 's/minSdkVersion = 22/minSdkVersion = 24/' android/variables.gradle || true
+          sed -i 's/targetSdkVersion = 33/targetSdkVersion = 34/' android/variables.gradle || true
+          sed -i 's/compileSdkVersion = 33/compileSdkVersion = 34/' android/variables.gradle || true
+      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: SpendTrack-Pro-APK
